@@ -29,6 +29,7 @@ prepare-sha2017: prepare
 
 clean:
 	rm -rf "$(BUILDDIR)"
+	rm components/micropython/mpconfigoverrides.h
 	source "$(IDF_PATH)/export.sh" && idf.py clean
 
 build:

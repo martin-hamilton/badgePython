@@ -73,7 +73,7 @@ int IRAM_ATTR wav_init_source(const void *data_start, const void *data_end, int 
     chunk_hdr_t *ch = (chunk_hdr_t *)p;
     if (memcmp(ch->magic, "fmt ", 4) == 0) {
       if (ch->fmt.fmtcode != WAVE_FORMAT_PCM) {
-        printf("Unsupported wav format: %d\n", ch->fmt.fmtcode);
+        ESP_LOGW(TAG, "Unsupported wav format: %d\n", ch->fmt.fmtcode);
         goto err;
       }
       wav->rate     = ch->fmt.samplespersec;
@@ -91,10 +91,10 @@ int IRAM_ATTR wav_init_source(const void *data_start, const void *data_end, int 
   }
 
   if (wav->bits != 8 && wav->bits != 16) {
-    printf("No fmt chunk or unsupported bits/sample: %d\n", wav->bits);
+    ESP_LOGW(TAG, "No fmt chunk or unsupported bits/sample: %d\n", wav->bits);
     goto err;
   }
-  printf("Wav: %d bit/sample, %d Hz, %d bytes long\n", wav->bits, wav->rate, wav->data_len);
+  ESP_LOGI(TAG, "channels: %d, bits: %d, rate: %d, len: %d", wav->channels, wav->bits, wav->rate, wav->data_len);
   wav->pos = 0;
   *ctx     = (void *)wav;
   *stereo  = (wav->channels >= 2);
@@ -183,8 +183,8 @@ int IRAM_ATTR wav_get_sample_rate(void *ctx) {
   return wav->rate;
 }
 
-int8_t get_sample_byte(wav_ctx_t *wav) {
-  int8_t rv = 0;
+uint8_t get_sample_byte(wav_ctx_t *wav) {
+  uint8_t rv = 0;
   if(wav->stream) {
     int read = wav->stream_read(wav->stream, &rv, 1);
     wav->pos += read;
