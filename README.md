@@ -1,6 +1,13 @@
 # BadgePython
 Experimental try at making an ESP-IDF v4.0 compatible Badge oriented Micropython firmware
 
+## New: NimBLE bluetooth support
+- No bonding
+    allows for BLE peripherals, like keyboards and mice
+- Audio works with bluetooth, not with wifi
+    therefore network support removed from `python_modules/common/audio.py`
+- Wifi still works, no audio support
+
 ## Supported environments
 * Linux
 * Mac OS

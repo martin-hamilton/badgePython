@@ -1,4 +1,4 @@
-import machine, sndmixer, urequests, os
+import machine, sndmixer, os
 from esp32 import NVS
 
 _no_channels = 4  # We can't play more than this number of channels concurrently without glitches
@@ -19,18 +19,14 @@ def _clean_channel(channel_id):
             file.close()
         del handles[channel_id]
 
-def _add_channel(filename_or_url, on_finished=None):
+def _add_channel(filename, on_finished=None):
     global handles
     stream = True
-    is_url = filename_or_url.startswith('http')
-    if is_url:
-        file = urequests.get(filename_or_url).raw
-    else:
-        try:
-            file = open(filename_or_url, 'rb')
-        except:
-            return -1
-    lower = filename_or_url.lower()
+    try:
+        file = open(filename, 'rb')
+    except:
+        return -1
+    lower = filename.lower()
     if(lower.endswith('.mp3')):
         channel_id = sndmixer.mp3_stream(file)
     elif(lower.endswith('.wav')):
@@ -50,10 +46,6 @@ def _add_channel(filename_or_url, on_finished=None):
     if channel_id < 0:
         return -1
 
-    if is_url:
-        # Needed when streaming from HTTP sockets
-        sndmixer.play(channel_id)
-
     def finish_callback(_):
         _clean_channel(channel_id)
         if on_finished is not None:
@@ -67,14 +59,14 @@ def _add_channel(filename_or_url, on_finished=None):
         sndmixer.on_finished(channel_id, finish_callback)
     return channel_id
 
-def play(filename_or_url, volume=None, loop=False, sync_beat=None, start_at_next=None, on_finished=None):
+def play(filename, volume=None, loop=False, sync_beat=None, start_at_next=None, on_finished=None):
     if volume is None:
         try:
             volume = NVS('system').get_i32('volume') 
         except:
             volume = 255
     _start_audio_if_needed()
-    channel_id = _add_channel(filename_or_url, on_finished)
+    channel_id = _add_channel(filename, on_finished)
     if channel_id is None or channel_id < 0:
         print('Failed to start audio channel')
         return channel_id

@@ -114,6 +114,7 @@ void mp_task(void *pvParameter) {
         case ESP_SPIRAM_SIZE_32MBITS:
         case ESP_SPIRAM_SIZE_64MBITS:
             mp_task_heap_size = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+            mp_task_heap_size -= 128 * 1024;
             mp_task_heap = heap_caps_malloc(mp_task_heap_size, MALLOC_CAP_SPIRAM);
             break;
         default:

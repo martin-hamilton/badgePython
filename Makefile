@@ -30,6 +30,7 @@ prepare-sha2017: prepare
 clean:
 	rm -rf "$(BUILDDIR)"
 	rm components/micropython/mpconfigoverrides.h
+	rm main/platform_gen.c
 	source "$(IDF_PATH)/export.sh" && idf.py clean
 
 build:
@@ -40,6 +41,9 @@ flash: build
 
 erase:
 	source "$(IDF_PATH)/export.sh" && idf.py erase-flash -p $(PORT)
+
+reconfigure:
+	source "$(IDF_PATH)/export.sh" && idf.py reconfigure
 
 monitor:
 	source "$(IDF_PATH)/export.sh" && idf.py monitor -p $(PORT)
